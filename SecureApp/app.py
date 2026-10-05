@@ -93,8 +93,14 @@ def change_email():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    submitted_token = request.form.get("csrf_token", "")
-    if not compare_digest(submitted_token, session.get("csrf_token", "")):
+    submitted_token = request.form.get("csrf_token")
+    session_token = session.get("csrf_token")
+
+    if (
+        not submitted_token
+        or not session_token
+        or not compare_digest(submitted_token, session_token)
+    ):
         app.logger.warning(
             "Email change rejected: invalid or missing CSRF token | "
             "user_id=%s | origin=%s | referer=%s",
